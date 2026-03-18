@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tarea 3 — Azure Load Balancer</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0078d4 0%, #004e8c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+
+    .header { text-align: center; margin-bottom: 32px; }
+    .header h1 { font-size: 1.6rem; color: #0078d4; }
+    .header p  { color: #555; margin-top: 6px; font-size: 0.95rem; }
+
+    .info-box {
+      background: #f0f6ff;
+      border: 1px solid #cce0ff;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+    .info-box strong { color: #004e8c; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background: #0078d4;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 200ms;
+    }
+    .btn:hover   { background: #005fa3; }
+    .btn:disabled{ background: #a0c4e8; cursor: not-allowed; }
+
+    .result-box {
+      margin-top: 24px;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border-radius: 10px;
+      padding: 20px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.9rem;
+      min-height: 100px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e6f4ea;
+      color: #1e7e34;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+    .badge.error { background: #fdecea; color: #c0392b; }
+
+    .counter {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #888;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h1>☁️ Azure Load Balancer Demo</h1>
+      <p>Tarea #3 — Seminario de Sistemas 1</p>
+    </div>
+
+    <div class="info-box">
+      <strong>Estudiante:</strong> Eliezer Guevara — 202100179<br> 
+      <strong>Curso:</strong> Seminario de Sistemas 1<br>
+      <strong>Endpoint:</strong> <code>/get-data</code> via Load Balancer
+    </div>
+
+    <button class="btn" id="btn" onclick="fetchData()">
+      🔄 Llamar al Load Balancer
+    </button>
+
+    <div class="result-box" id="result">
+Presiona el botón para consultar el Load Balancer...
+    </div>
+
+    <div class="counter" id="counter"></div>
+  </div>
+
+  <script>
+    // ⚠️ CAMBIA esta IP/hostname por la IP pública de tu Azure Load Balancer
+    const LB_URL = 'http://TU_IP_LOAD_BALANCER/get-data'
+
+    let callCount = 0
+
+    async function fetchData() {
+      const btn    = document.getElementById('btn')
+      const result = document.getElementById('result')
+      const counter = document.getElementById('counter')
+
+      btn.disabled = true
+      btn.textContent = '⏳ Consultando...'
+      result.textContent = 'Esperando respuesta...'
+
+      try {
+        const res = await fetch(LB_URL)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+        const data = await res.json()
+        callCount++
+
+        result.textContent = JSON.stringify(data, null, 2)
+
+        // Mostrar qué instancia respondió
+        const inst = data.Instancia || data.instancia || '?'
+        counter.innerHTML =
+          `Llamada #${callCount} · Respondió: <span class="badge">${inst}</span>`
+      } catch (err) {
+        result.textContent = `❌ Error: ${err.message}\n\nVerifica que:\n- La IP del LB es correcta\n- Las VMs están corriendo\n- CORS está habilitado en las APIs`
+        counter.innerHTML = `<span class="badge error">Error en llamada #${callCount + 1}</span>`
+      } finally {
+        btn.disabled = false
+        btn.textContent = '🔄 Llamar al Load Balancer'
+      }
+    }
+  </script>
+</body>
+</html>
