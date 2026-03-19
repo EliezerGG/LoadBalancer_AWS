@@ -1,0 +1,55 @@
+# ============================================================
+# AMBAS VMs: instalar Docker (ejecutar en vm-api1 y vm-api2)
+# ============================================================
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER
+newgrp docker   # aplica el grupo sin cerrar sesión
+
+# ============================================================
+# vm-api1 — API Node.js
+# ============================================================
+git clone https://github.com/TU_USUARIO/SEMINARIO1_B_PRACTICAS_1S2026.git
+cd SEMINARIO1_B_PRACTICAS_1S2026/HT1/api-node   # ajusta la ruta real
+
+# Construir imagen
+docker build -t api1-node .
+
+# Correr en puerto 80 (el LB de Azure espera puerto 80)
+docker run -d \
+  --name api1 \
+  --restart unless-stopped \
+  -p 80:3000 \
+  api1-node
+
+# Verificar
+curl http://localhost/get-data
+curl http://localhost/health
+
+# ============================================================
+# vm-api2 — API Go
+# ============================================================
+git clone https://github.com/TU_USUARIO/SEMINARIO1_B_PRACTICAS_1S2026.git
+cd SEMINARIO1_B_PRACTICAS_1S2026/HT1/api-go     # ajusta la ruta real
+
+# Construir imagen
+docker build -t api2-go .
+
+# Correr en puerto 80 (Go expone 8080, mapeamos a 80)
+docker run -d \
+  --name api2 \
+  --restart unless-stopped \
+  -p 80:8080 \
+  api2-go
+
+# Verificar
+curl http://localhost/get-data
+curl http://localhost/health
+
+# ============================================================
+# Comandos útiles para el video (detener/reiniciar)
+# ============================================================
+docker stop api1      # detener API para simular falla
+docker start api1     # reiniciar API
+docker logs api1 -f   # ver logs en vivo
