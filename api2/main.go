@@ -33,7 +33,7 @@ func getDataHandler(w http.ResponseWriter, r *http.Request) {
 	data := map[string]string{
 		"Instancia":  "Instancia #2 - API #2",
 		"Curso":      "Seminario de Sistemas 1",
-		"Estudiante": "Mynorjoel - TU_CARNET", // ← cambia esto
+		"Estudiante": "Eliezer Guevara - 202100179",
 		"Lenguaje":   "Go",
 		"Puerto":     getPort(),
 	}
@@ -50,7 +50,7 @@ func getPort() string {
 	if p := os.Getenv("PORT"); p != "" {
 		return p
 	}
-	return "8080"
+	return "3000"
 }
 
 func main() {

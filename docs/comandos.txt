@@ -36,11 +36,11 @@ cd SEMINARIO1_B_PRACTICAS_1S2026/HT1/api-go     # ajusta la ruta real
 # Construir imagen
 docker build -t api2-go .
 
-# Correr en puerto 80 (Go expone 8080, mapeamos a 80)
+# Correr en puerto 80 (Go expone 3000, mapeamos a 80)
 docker run -d \
   --name api2 \
   --restart unless-stopped \
-  -p 80:8080 \
+  -p 80:3000 \
   api2-go
 
 # Verificar
