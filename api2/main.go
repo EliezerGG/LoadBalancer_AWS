@@ -13,6 +13,20 @@ type Response struct {
 	Estudiante string `json:"Estudiante"`
 }
 
+// Middleware CORS — aplica a todas las rutas
+func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next(w, r)
+	}
+}
+
 func checkHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
@@ -26,10 +40,8 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-
 func getDataHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	data := map[string]string{
 		"Instancia":  "Instancia #2 - API #2",
 		"Curso":      "Seminario de Sistemas 1",
@@ -54,11 +66,10 @@ func getPort() string {
 }
 
 func main() {
-
-    http.HandleFunc("/get-data", getDataHandler)
-    http.HandleFunc("/health",   healthHandler)
-	http.HandleFunc("/check", checkHandler)
-	http.HandleFunc("/", rootHandler)
+	http.HandleFunc("/get-data", corsMiddleware(getDataHandler))
+	http.HandleFunc("/health",   corsMiddleware(healthHandler))
+	http.HandleFunc("/check",    corsMiddleware(checkHandler))
+	http.HandleFunc("/",         corsMiddleware(rootHandler))
 
 	fmt.Println("API #2 (Go) corriendo en puerto 3000")
 	http.ListenAndServe(":3000", nil)

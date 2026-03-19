@@ -3,6 +3,9 @@ import express, { Request, Response } from 'express';
 const app = express();
 const PORT = 3000;
 
+// CORS — permite peticiones desde cualquier origen (Blob Storage, etc.)
+app.use(cors());
+
 app.get('/check', (_req: Request, res: Response) => {
   res.sendStatus(200);
 });
