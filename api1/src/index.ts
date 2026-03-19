@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
+import cors from 'cors';  
 
 const app = express();
 const PORT = 3000;
 
-// CORS — permite peticiones desde cualquier origen (Blob Storage, etc.)
 app.use(cors());
 
 app.get('/check', (_req: Request, res: Response) => {
@@ -12,8 +12,8 @@ app.get('/check', (_req: Request, res: Response) => {
 
 app.get('/', (_req: Request, res: Response) => {
   res.json({
-    Instancia: 'Instancia #1 - API #1',
-    Curso: 'Seminario de Sistemas 1',
+    Instancia:  'Instancia #1 - API #1',
+    Curso:      'Seminario de Sistemas 1',
     Estudiante: 'Eliezer Guevara - 202100179',
   });
 });
